@@ -30,4 +30,3 @@ Users associated with certain roles on Assign Roles page (manage/role-strategy/a
 <br>![task1_3](IMG/task1_3_2.png)</br>
 
 ## Part 2
-some changes
