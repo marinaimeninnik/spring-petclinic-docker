@@ -25,9 +25,17 @@ Vagrant.configure("2") do |machine|
         config.vm.provision "shell", inline: <<-SHELL
             echo "Updating system..."
             apt update -y &>/dev/null
+            
             echo "Installing openJDK..."
             apt install fontconfig openjdk-17-jre -yq &>/dev/null
             java -version
+            
+            echo "Installing linter 'hadolint'..."
+            wget https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64 &>/dev/null
+            mv hadolint-Linux-x86_64 /usr/local/bin/hadolint
+            chmod +x /usr/local/bin/hadolint
+            hadolint --version
+
           SHELL
     
     end
