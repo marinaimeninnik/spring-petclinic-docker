@@ -1,0 +1,35 @@
+win_server2012 = "tcthien/java-dev-server"
+ubuntu_2204 = "ubuntu/jammy64"
+machine_name = "ubuntu_agent"
+PROJECT_NAME = "JenkinsTask"
+
+
+Vagrant.configure("2") do |machine|
+    machine.vm.define machine_name do |config|
+        config.vm.box = ubuntu_2204
+        config.vm.hostname = "jenkins-slave"
+        # config.vm.communicator = "winrm"
+        config.vm.network "public_network",
+            ip: "192.168.0.101",
+            bridge: "wlo1"
+        config.vm.provider "virtualbox" do |vb|
+            vb.linked_clone = true
+            vb.memory = "4096"
+            vb.name = machine_name
+            vb.cpus = 2
+            vb.customize ["modifyvm", :id,
+              "--rtcuseutc", "on",
+              "--groups",  "/#{PROJECT_NAME}"]
+        end
+
+        config.vm.provision "shell", inline: <<-SHELL
+            echo "Updating system..."
+            apt update -y &>/dev/null
+            echo "Installing openJDK..."
+            apt install fontconfig openjdk-17-jre -yq &>/dev/null
+            java -version
+          SHELL
+    
+    end
+  
+end
