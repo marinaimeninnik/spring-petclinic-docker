@@ -23,3 +23,7 @@ apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin do
 # change /lib/systemd/system/docker.service
 # # ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
 # ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:4243 -H unix:///var/run/docker.sock
+
+# sudo usermod -aG docker jenkins
+# sudo chmod a+rwx /var/run/docker.sock
+# sudo systemctl restart docker.service
