@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation Template for an EC2 instance with a security group.
+
+Parameters:
+  # KeyName:
+  #   Description: Name of an existing EC2 Key Pair to enable SSH access to the instance
+  #   Type: AWS::EC2::KeyPair::KeyName
+  #   ConstraintDescription: Must be the name of an existing EC2 Key Pair.
+
+  AwsRegion:
+    Description: AWS region for deployment
+    Type: String
+    Default: us-east-1
+
+  AllowedCIDR:
+    Description: Allowed IP Range (CIDR format) for SSH access
+    Type: String
+    Default: 0.0.0.0/0
+
+  MyVpcId:
+    Description: VPC ID to associate with the security group
+    Type: AWS::EC2::VPC::Id
+
+  MyAmiId:
+    Description: ID of the Amazon Machine Image (AMI)
+    Type: AWS::EC2::Image::Id
+
+Resources:
+
+  JenkinsKeyPair:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName: !Sub ${AWS::StackName}-rsa
+
+  JenkinsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: JenkinsEC2 Security Group
+      VpcId: !Ref MyVpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref AllowedCIDR
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+
+  JenkinsEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      KeyName: !Ref JenkinsKeyPair
+      SecurityGroups:
+        - !GetAtt JenkinsSecurityGroup.GroupId
+      ImageId: !Ref MyAmiId
+      # AvailabilityZone: !Select [0, !GetAZs !Ref AwsRegion]  # Get the first Availability Zone in the specified region
+
+Outputs:
+  InstanceId:
+    Description: ID of the newly created EC2 instance
+    Value: !Ref JenkinsEC2Instance
+  KeyPairName:
+    Description: Name of the newly created Key Pair
+    Value: !Ref JenkinsKeyPair
