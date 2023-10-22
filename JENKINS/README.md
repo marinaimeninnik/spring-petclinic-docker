@@ -29,4 +29,25 @@ Roles created and configured on "Manage role" screen (manage/role-strategy/)
 Users associated with certain roles on Assign Roles page (manage/role-strategy/assign-roles)
 <br>![task1_3](IMG/task1_3_2.png)</br>
 
-## Part 2
+## Part 2 (Multibranch)
+...
+
+## Part 3 (CI pipeline)
+...
+### 4. Launch static code analysis, Bugs, Vulnerabilities, Security Hotspots, Code Smells available on SonarQube server.
+SonarCube server installation and configuration via [script](/home/maryna-n/Documents/EPAM/devops-7-nazarenko-maryna-1/JENKINS/ENV/sonarcube-server_env.sh) based on this [article](https://medium.com/@deshdeepakdhobi/how-to-install-and-configure-sonarqube-on-aws-ec2-ubuntu-22-04-c89a3f1c2447)
+
+Postgre installation and db configuration
+<br>![task3_4](IMG/task3_4_1.png)</br>
+
+Eventually SonarQube docker image had been used for express launch and functionality testing.
+```
+$ docker run -d --name sonarqube -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true -p 9000:9000 sonarqube:latest
+```
+But at real production I would use script above for configuring free-standing SonarQube server
+
+SonarQube scanner plugin installed and it's server configured
+<br>![task3_4](IMG/task3_4_2.png)</br>
+<br>![task3_4](IMG/task3_4_3.png)</br>
+
+### 7. Push image into Docker Hub

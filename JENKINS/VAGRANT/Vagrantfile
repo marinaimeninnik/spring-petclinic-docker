@@ -12,6 +12,9 @@ Vagrant.configure("2") do |machine|
         config.vm.network "public_network",
             ip: "192.168.0.101",
             bridge: "wlo1"
+        # config.vm.network "forwarded_port",
+        #     guest: 9000,
+        #     host: 9000
         config.vm.provider "virtualbox" do |vb|
             vb.linked_clone = true
             vb.memory = "4096"
@@ -36,7 +39,13 @@ Vagrant.configure("2") do |machine|
             chmod +x /usr/local/bin/hadolint
             hadolint --version
 
+            echo "installing maven"
+            apt install maven -y &>/dev/null
+            mvn -version
+
           SHELL
+        config.vm.provision "shell", path: "docker_env.sh"
+
     
     end
   
