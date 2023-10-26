@@ -10,7 +10,7 @@ pipeline {
     
     environment {
         DOCKERHUB_CREDENTIALS = credentials('3fd6e258-dfed-4537-a548-c3272953e573')
-        RETRIES = 5 // Number of retries
+        RETRIES = 6 // Number of retries
         RETRY_INTERVAL = 30 // Seconds between retries
     }
 
@@ -33,7 +33,7 @@ pipeline {
                             sshagent([serverName]) {
                                 // sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} echo 'hey you there'"
                                 sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerLogin}"
-                                sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerRun}"
+                                // sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerRun}"
                             }
                         }
                     } else {
@@ -48,11 +48,11 @@ pipeline {
                 script {
                     def ready = false
                     for (int i = 0; i < RETRIES; i++) {
-                        def response = sh(script: "curl -Is http://${publicIp}:8080", returnStatus: true, returnStdout: true, quiet: true)
+                        def response = sh(script: "curl -Is http://${publicIp}:8080", returnStatus: true, returnStdout: true)
                         def exitCode = response
 
                         if (exitCode == 0) {
-                            def responseBody = response.getStdout()
+                            def responseBody = response
                             if (responseBody =~ /HTTP\/1\.\d+ 200 OK/) {
                                 ready = true
                                 break
