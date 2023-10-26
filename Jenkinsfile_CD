@@ -35,7 +35,7 @@ pipeline {
                         def dockerRun = 'sudo docker run -p 8080:8080 -d marinaimeninnik/petclinic:latest'
                         def dockerLogin = 'sudo docker login -u $DOCKERHUB_CREDENTIALS_USR -p $DOCKERHUB_CREDENTIALS_PSW'
                         
-                        sshagent([${deployServer}]) {
+                        sshagent([sshAgentCredential(credentialsId: '${deployServer}')]) {
                             sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerLogin}"
                             sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerRun}"                            
                         }
