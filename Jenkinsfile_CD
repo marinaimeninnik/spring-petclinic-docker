@@ -46,7 +46,7 @@ pipeline {
         stage('Health Check') {
             steps {
                 script {
-                    def healthCheckCommand = 'curl -s http://localhost:8080/health | grep -q "status\":\"UP"'
+                    def healthCheckCommand = 'curl -s http://${publicIp}:8080 | grep -q '<!DOCTYPE html>''
                     def retries = 0
                     def maxRetries = 10
 
