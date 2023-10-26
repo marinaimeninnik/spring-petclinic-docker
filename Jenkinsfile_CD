@@ -4,7 +4,7 @@ pipeline {
     }
 
     parameters{
-        string(name: 'publicIp', defaultValue: '0.0.0.0', description: 'Enter public ip target deployment machine'),
+        string(name: 'publicIp', defaultValue: '0.0.0.0', description: 'Enter public ip target deployment machine')
         choice(name: 'environment', choices: ['dev', 'qa'], description: 'Select environment for deployment')
     }
     
