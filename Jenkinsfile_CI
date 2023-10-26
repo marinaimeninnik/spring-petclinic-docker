@@ -29,13 +29,13 @@ pipeline {
         //         sh "./mvnw package"
         //     }
 
-        // stage('Scan with SonarQube') {
-        //     steps {
-        //         withSonarQubeEnv(installationName: 'SQ') { 
-        //             sh 'mvn clean package org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
-        //         }
-        //     }
-        // }
+        stage('Scan with SonarQube') {
+            steps {
+                withSonarQubeEnv(installationName: 'SQ') { 
+                    sh './mvnw package org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
+                }
+            }
+        }
 
         stage('Build Docker Image') {
             steps {                
