@@ -49,9 +49,9 @@ pipeline {
                     def ready = false
                     for (int i = 0; i < RETRIES; i++) {
                         def response = sh(script: "curl -Is http://${publicIp}:8080", returnStatus: true, returnStdout: true, quiet: true)
-                        def statusCode = response.getStatus()
+                        def exitCode = response
 
-                        if (statusCode == 0) {
+                        if (exitCode == 0) {
                             def responseBody = response.getStdout()
                             if (responseBody =~ /HTTP\/1\.\d+ 200 OK/) {
                                 ready = true
