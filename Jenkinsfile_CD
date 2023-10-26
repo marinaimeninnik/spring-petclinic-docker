@@ -33,7 +33,7 @@ pipeline {
                             sshagent([serverName]) {
                                 // sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} echo 'hey you there'"
                                 sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerLogin}"
-                                sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerRun}"
+                                // sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerRun}"
                             }
                         }
                     } else {
@@ -47,8 +47,8 @@ pipeline {
             steps {
                 script {
                     def healthCheckCommand = "curl -s http://${publicIp}:8080 | grep -q '<!DOCTYPE html>'"
-                    def retries = 0
-                    def maxRetries = 10
+                    def retries = 
+                    def maxRetries = RETRIES
 
                     while (retries < maxRetries) {
                         def healthCheckResult = sh(script: healthCheckCommand, returnStatus: true)
@@ -56,8 +56,8 @@ pipeline {
                             echo 'Application is healthy'
                             break
                         } else {
-                            echo 'Application is not healthy yet, retrying in 10 seconds...'
-                            sleep 30
+                            echo 'Application is not healthy yet, retrying...'
+                            sleep RETRY_INTERVAL
                             retries++
                         }
                     }
