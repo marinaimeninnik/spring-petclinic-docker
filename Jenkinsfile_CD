@@ -55,13 +55,12 @@ pipeline {
                         }
                         sleep(time: RETRY_INTERVAL, unit: 'SECONDS')
                     }
-                }
+                    if (ready) {
+                        echo "Server is ready."
 
-                if (ready) {
-                    echo "Server is ready."
-
-                } else {
-                    error "Server did not become ready in a reasonable time."
+                    } else {
+                        error "Server did not become ready in a reasonable time."
+                    }
                 }
             }
         }
