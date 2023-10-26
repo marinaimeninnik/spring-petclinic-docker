@@ -4,7 +4,7 @@ pipeline {
     }
 
     parameters{
-        string(name: 'publicIp', defaultValue: '0.0.0.0', description: 'Enter public ip target deployment machine')
+        string(name: 'publicIp', defaultValue: '3.70.166.62', description: 'Enter public ip target deployment machine')
         choice(name: 'environment', choices: ['dev', 'qa'], description: 'Select environment for deployment')
     }
     
@@ -22,12 +22,13 @@ pipeline {
         stage('Run container on chosen server') {
             steps {
                 script{
-                    
+                    def deployServer
+
                     if (params.environment == 'dev'){
-                        def deployServer = 'dev-server'
+                        deployServer = 'dev-server'
                     }
                     else if (params.environment == 'qa'){
-                        def deployServer = 'qa-server'
+                        deployServer = 'qa-server'
                     }
 
                     withCredentials([usernamePassword(credentialsId: '3fd6e258-dfed-4537-a548-c3272953e573', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {                        
