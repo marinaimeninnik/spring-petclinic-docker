@@ -10,9 +10,7 @@ pipeline {
     
     environment {
         DOCKERHUB_CREDENTIALS = credentials('3fd6e258-dfed-4537-a548-c3272953e573')
-        RETRIES = 6 // Number of retries
-        RETRY_INTERVAL = 30 // Seconds between retries
-    }
+       }
 
     stages {
         stage('Clean workspace'){
@@ -48,7 +46,7 @@ pipeline {
                 script {
                     def healthCheckCommand = "curl -s http://${publicIp}:8080 | grep -q '<!DOCTYPE html>'"
                     def retries = 
-                    def maxRetries = RETRIES
+                    def maxRetries = 10
 
                     while (retries < maxRetries) {
                         def healthCheckResult = sh(script: healthCheckCommand, returnStatus: true)
@@ -56,8 +54,8 @@ pipeline {
                             echo 'Application is healthy'
                             break
                         } else {
-                            echo 'Application is not healthy yet, retrying...'
-                            sleep RETRY_INTERVAL
+                            echo 'Application is not healthy yet, retrying in 30 seconds...'
+                            sleep 30
                             retries++
                         }
                     }
