@@ -10,16 +10,6 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDENTIALS = credentials('3fd6e258-dfed-4537-a548-c3272953e573')
-        SERVER_DETAILS = [
-            dev: [
-                serverName: 'dev-server',
-                dockerRun: 'sudo docker run -p 8080:8080 -d marinaimeninnik/petclinic:latest',
-            ],
-            qa: [
-                serverName: 'qa-server',
-                dockerRun: 'sudo docker run -p 8080:8080 -d marinaimeninnik/petclinic:latest',
-            ],
-        ]
     }
 
     stages {
@@ -32,7 +22,18 @@ pipeline {
         stage('Run container on chosen server') {
             steps {
                 script {
-                    def serverDetails = SERVER_DETAILS[params.environment]
+                    def serverDetails = [:]
+                    if (params.environment == 'dev') {
+                        serverDetails = [
+                            serverName: 'dev-server',
+                            dockerRun: 'sudo docker run -p 8080:8080 -d marinaimeninnik/petclinic:latest',
+                        ]
+                    } else if (params.environment == 'qa') {
+                        serverDetails = [
+                            serverName: 'qa-server',
+                            dockerRun: 'sudo docker run -p 8080:8080 -d marinaimeninnik/petclinic:latest',
+                        ]
+                    }
 
                     withCredentials([usernamePassword(credentialsId: '3fd6e258-dfed-4537-a548-c3272953e573', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
                         sshagent([serverDetails.serverName]) {
