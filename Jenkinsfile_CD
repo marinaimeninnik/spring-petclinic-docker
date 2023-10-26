@@ -30,8 +30,8 @@ pipeline {
 
                             sshagent([serverName]) {
                                 sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} echo 'hey you there'"
-                                // sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerLogin}"
-                                sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerRun}"
+                                sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerLogin}"
+                                // sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerRun}"
                             }
                         }
                     }
