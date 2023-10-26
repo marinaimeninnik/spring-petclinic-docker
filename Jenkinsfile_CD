@@ -10,6 +10,8 @@ pipeline {
     
     environment {
         DOCKERHUB_CREDENTIALS = credentials('3fd6e258-dfed-4537-a548-c3272953e573')
+        RETRIES = 5 // Number of retries
+        RETRY_INTERVAL = 30 // Seconds between retries
     }
 
     stages {
@@ -29,15 +31,39 @@ pipeline {
                             def serverName = params.environment == 'dev' ? 'dev-server' : 'qa-server'
 
                             sshagent([serverName]) {
-                                sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} echo 'hey you there'"
+                                // sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} echo 'hey you there'"
                                 sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerLogin}"
-                                // sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerRun}"
+                                sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerRun}"
                             }
                         }
+                    } else {
+                        error "Invalid environment specified."
                     }
                 }
             }
         }
 
+        stage('Health Check') {
+            steps {
+                script {
+                    def ready = false
+                    for (int i = 0; i < RETRIES; i++) {
+                        def response = sh(script: "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} curl -Is http://localhost:8080 | head -n 1 | cut -d ' ' -f 2", returnStatus: true, quiet: true).trim()
+                        if (response == '200') {
+                            ready = true
+                            break
+                        }
+                        sleep(time: RETRY_INTERVAL, unit: 'SECONDS')
+                    }
+                }
+
+                if (ready) {
+                    echo "Server is ready."
+
+                } else {
+                    error "Server did not become ready in a reasonable time."
+                }
+            }
+        }
     }
 }
