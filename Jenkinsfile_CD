@@ -3,13 +3,11 @@ pipeline {
         label 'ubuntu22_04'
     }
 
-    properties([
-        parameters(
+    parameters{
            [string(defaultValue: '0.0.0.0', description: 'Enter public ip target deployment machine', name: 'publicIp'),
             choice(choices: ['dev', 'qa'], description: 'Select environment for deployment', name: 'environment')
             ]
-        )
-    ])
+    }
     
     environment {
         DOCKERHUB_CREDENTIALS = credentials('3fd6e258-dfed-4537-a548-c3272953e573')
