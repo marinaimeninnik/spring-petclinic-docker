@@ -1,0 +1,39 @@
+pipeline {
+    agent {
+        label 'ubuntu22_04'
+    }
+
+    parameters {
+        // booleanParam(name: 'autoApprove', defaultValue: false, description: 'Automatically run apply after generating plan?')
+        // choice(name: 'dockerImage', choices: ['marinaimeninnik/spring-framework-petclinic:latest'], description: 'Docker image to deploy')
+        choice(name: 'environment', choices: ['dev', 'qa'], description: 'Select environment for deployment')
+
+    }
+
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('3fd6e258-dfed-4537-a548-c3272953e573')
+    }
+
+    stages {
+        stage('Clean workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+
+        stage('Run container on ${environment} server') {
+            steps {
+                script{
+                    withCredentials([usernamePassword(credentialsId: '3fd6e258-dfed-4537-a548-c3272953e573', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {                        
+                        def dockerRun = 'sudo docker run -p 8080:8080 -d marinaimeninnik/petclinic:latest'
+                        def dockerLogin = 'sudo docker login -u $DOCKERHUB_CREDENTIALS_USR -p $DOCKERHUB_CREDENTIALS_PSW'
+                        sshagent(['dev-server']) {
+                            sh "ssh -o StrictHostKeyChecking=no ubuntu@3.70.166.62 ${dockerLogin}"
+                            sh "ssh -o StrictHostKeyChecking=no ubuntu@3.70.166.62 ${dockerRun}"                            
+                        }
+                    }
+                }    
+            }
+        }
+    }
+}
