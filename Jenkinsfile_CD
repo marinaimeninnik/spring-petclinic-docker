@@ -21,8 +21,7 @@ pipeline {
                                          script: [classpath: [],
                                             oldScript: '',
                                             sandbox: false,
-                                                script: '''def dockerImage = "marinaimeninnik/petclinic"
-                                                        sh(script: "docker image ls ${dockerImage} --format \'{{.Tag}}\'", returnStdout: true).trim().split(\'\\n\').toList()'''
+                                                script: '''sh "sudo docker image ls marinaimeninnik/petclinic --format \'{{.Tag}}\'", returnStdout: true).trim().split(\'\\n\').toList()'''
                                                 ]
                         )
                     )
@@ -38,7 +37,22 @@ pipeline {
                 cleanWs()
             }
         }
-        
+
+        stage('Get Docker Image Tags') {
+            steps {
+                script {
+                    def dockerImage = "marinaimeninnik/petclinic"
+                    def dockerTags = sh(script: "docker image ls ${dockerImage} --format '{{.Tag}}'", returnStdout: true).trim().split('\n').toList()
+                    echo "Docker Image Tags: ${dockerTags}"
+                    properties([
+                        parameters([
+                            choice(choices: dockerTags, description: 'Select Docker Image Tag', name: 'DOCKER_IMAGE_TAG')
+                        ])
+                    ])
+                }
+            }
+        }
+
         stage('Run container on chosen server') {
             steps {
                 script {
