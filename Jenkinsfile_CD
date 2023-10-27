@@ -6,30 +6,9 @@ pipeline {
     parameters{
         string(name: 'publicIp', defaultValue: '18.159.208.8', description: 'Enter public ip target deployment machine')
         choice(name: 'environment', choices: ['dev', 'qa'], description: 'Select environment for deployment')
-        reactiveChoice(choiceType: 'PT_SINGLE_SELECT',
-                       description: 'Choose docker image version',
-                       filterLength: 1,
-                       filterable: false,
-                       name: 'dockerTag',
-                       randomName: 'choice-parameter-7767039862856',
-                       referencedParameters: '',
-                       script: groovyScript(
-                        fallbackScript: [classpath: [],
-                                         oldScript: '',
-                                         sandbox: false,
-                                         script: ''],
-                                         script: [classpath: [],
-                                            oldScript: '',
-                                            sandbox: false, script: '''
-                                            def dockerImage = "marinaimeninnik/petclinic"
-                                            def dockerTags = sh(script: "docker image ls ${dockerImage} --format \'{{.Tag}}\'", returnStdout: true).trim().split(\'\\n\').toList()
-                                            echo "Docker Image Tags: ${dockerTags}"
-                                            properties([
-                                                parameters([
-                                                    choice(choices: dockerTags, description: \'Select Docker Image Tag\', name: \'DOCKER_IMAGE_TAG\')
-                                                ])
-                                            ])''']))
-    }
+        imageTag(name: 'DOCKER_IMAGE', description: '',
+             image: 'marinaimeninnik/petclinic', filter: '', defaultTag: 'latest',
+             registry: 'https://registry-1.docker.io', credentialId: '', tagOrder: 'NATURAL')}
     
     environment {
         DOCKERHUB_CREDENTIALS = credentials('3fd6e258-dfed-4537-a548-c3272953e573')
