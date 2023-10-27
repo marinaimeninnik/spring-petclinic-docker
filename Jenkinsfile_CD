@@ -6,6 +6,26 @@ pipeline {
     parameters{
         string(name: 'publicIp', defaultValue: '18.159.208.8', description: 'Enter public ip target deployment machine')
         choice(name: 'environment', choices: ['dev', 'qa'], description: 'Select environment for deployment')
+        reactiveChoice(choiceType: 'PT_SINGLE_SELECT',
+                       description: 'Choose docker image version',
+                       filterLength: 1,
+                       filterable: false,
+                       name: 'dockerTag',
+                       randomName: 'choice-parameter-7767039862856',
+                       referencedParameters: '',
+                       script: groovyScript(
+                        fallbackScript: [classpath: [],
+                                         oldScript: '',
+                                         sandbox: false,
+                                         script: ''],
+                                         script: [classpath: [],
+                                            oldScript: '',
+                                            sandbox: false,
+                                                script: '''def dockerImage = "marinaimeninnik/petclinic"
+                                                        sh(script: "docker image ls ${dockerImage} --format \'{{.Tag}}\'", returnStdout: true).trim().split(\'\\n\').toList()'''
+                                                ]
+                        )
+                    )
     }
     
     environment {
@@ -46,7 +66,7 @@ pipeline {
                             sshagent([serverName]) {
                                 // sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} echo 'hey you there'"
                                 sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerLogin}"
-                                sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerRun}"
+                                // sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerRun}"
                             }
                         }
                     } else {
