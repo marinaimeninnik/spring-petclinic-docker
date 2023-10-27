@@ -9,17 +9,17 @@ pipeline {
         choice(
             name: 'dockerTag',
             description: 'Select a Docker image version',
-            script: [
+            script: {
                 $class: 'GroovyScript',
-                script: [
+                script: {
                     classpath: [],
                     sandbox: false,
                     script: 'def imageName = "marinaimeninnik/petclinic"\n' +
                             'def dockerTags = "docker pull --all-tags $imageName".execute().text\n' +
                             'def tagsArray = dockerTags.readLines()\n' +
                             'return tagsArray.join(",")'
-                ]
-            ]
+                }
+            }
         )
     }
     
