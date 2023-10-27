@@ -23,7 +23,7 @@ pipeline {
             steps {
                 script {
                     def dockerImage = "marinaimeninnik/petclinic"
-                    def dockerTags = sh(script: "docker image ls ${dockerImage} --format '{{.Tag}}'", returnStdout: true).trim().split('\n')
+                    def dockerTags = sh(script: "docker image ls ${dockerImage} --format '{{.Tag}}'", returnStdout: true).trim().split('\n').toList()
                     echo "Docker Image Tags: ${dockerTags}"
                     properties([
                         parameters([
