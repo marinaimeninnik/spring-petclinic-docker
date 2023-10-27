@@ -1,3 +1,13 @@
+def getDockerImageTags() {
+    def image = docker.image('marinaimeninnik/spring-framework-petclinic')
+    def tags = image.inside {
+        sh 'docker images --format "{{.Tag}}" marinaimeninnik/spring-framework-petclinic'
+    }
+    return tags.split('\n')
+}
+
+
+
 pipeline {
     agent {
         label 'ubuntu22_04'
@@ -6,21 +16,12 @@ pipeline {
     parameters{
         string(name: 'publicIp', defaultValue: '18.159.208.8', description: 'Enter public ip target deployment machine')
         choice(name: 'environment', choices: ['dev', 'qa'], description: 'Select environment for deployment')
-        choice(
-            name: 'dockerTag',
-            description: 'Select a Docker image version',
-            script: {
-                $class: 'GroovyScript',
-                script: {
-                    classpath: [],
-                    sandbox: false,
-                    script: 'def imageName = "marinaimeninnik/petclinic"\n' +
-                            'def dockerTags = "docker pull --all-tags $imageName".execute().text\n' +
-                            'def tagsArray = dockerTags.readLines()\n' +
-                            'return tagsArray.join(",")'
-                }
+        activeChoiceReactiveParam('dockerTag') {
+            description('Select a Docker image tag')
+            script {
+                return getDockerImageTags()
             }
-        )
+        }
     }
     
     environment {
