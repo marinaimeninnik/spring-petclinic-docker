@@ -21,60 +21,60 @@ pipeline {
             }
         }
 
-        // stage('Run container on chosen server') {
+        stage('Run container on chosen server') {
+            steps {
+                script {
+                    if (params.environment == 'dev' || params.environment == 'qa') {
+                        withCredentials([usernamePassword(credentialsId: '3fd6e258-dfed-4537-a548-c3272953e573', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
+                            def dockerRun = 'sudo docker run -p 8080:8080 -d $dockerImage'
+                            def dockerLogin = 'sudo docker login -u $DOCKERHUB_CREDENTIALS_USR -p $DOCKERHUB_CREDENTIALS_PSW'
+                            def serverName = params.environment == 'dev' ? 'dev-server' : 'qa-server'
+
+                            sshagent([serverName]) {
+                                // sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} echo 'hey you there'"
+                                sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerLogin}"
+                                sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerRun}"
+                            }
+                        }
+                    } else {
+                        error "Invalid environment specified."
+                    }
+                }
+            }
+        }
+
+        // stage('Run container on chosen server'){
         //     steps {
-        //         script {
-        //             if (params.environment == 'dev' || params.environment == 'qa') {
-        //                 withCredentials([usernamePassword(credentialsId: '3fd6e258-dfed-4537-a548-c3272953e573', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
+        //         script{
+        //             if (params.environment == 'dev'){
+        //                 withCredentials([usernamePassword(credentialsId: '3fd6e258-dfed-4537-a548-c3272953e573', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {                        
+                        
         //                     def dockerRun = 'sudo docker run -p 8080:8080 -d $dockerImage'
         //                     def dockerLogin = 'sudo docker login -u $DOCKERHUB_CREDENTIALS_USR -p $DOCKERHUB_CREDENTIALS_PSW'
-        //                     def serverName = params.environment == 'dev' ? 'dev-server' : 'qa-server'
-
-        //                     sshagent([serverName]) {
-        //                         // sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} echo 'hey you there'"
-        //                         sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerLogin}"
-        //                         sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerRun}"
+                            
+        //                     sshagent(['dev-server']){
+        //                         sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} echo 'hey you there'"
+        //                         // sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerLogin}"
+        //                         // sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerRun}"                            
+        //                     }
+        //                    } 
+        //                 }
+        //             else if (params.environment == 'qa'){
+        //                 withCredentials([usernamePassword(credentialsId: '3fd6e258-dfed-4537-a548-c3272953e573', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {                        
+                            
+        //                     def dockerRun = 'sudo docker run -p 8080:8080 -d $dockerImage'
+        //                     def dockerLogin = 'sudo docker login -u $DOCKERHUB_CREDENTIALS_USR -p $DOCKERHUB_CREDENTIALS_PSW'
+                            
+        //                     sshagent(['qa-server']){
+        //                         sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} echo 'hey you there'"
+        //                         // sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerLogin}"
+        //                         // sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerRun}"                            
         //                     }
         //                 }
-        //             } else {
-        //                 error "Invalid environment specified."
         //             }
-        //         }
+        //         } 
         //     }
-        // }
-
-        stage('Run container on chosen server'){
-            steps {
-                script{
-                    if (params.environment == 'dev'){
-                        withCredentials([usernamePassword(credentialsId: '3fd6e258-dfed-4537-a548-c3272953e573', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {                        
-                        
-                            def dockerRun = 'sudo docker run -p 8080:8080 -d $dockerImage'
-                            def dockerLogin = 'sudo docker login -u $DOCKERHUB_CREDENTIALS_USR -p $DOCKERHUB_CREDENTIALS_PSW'
-                            
-                            sshagent(['dev-server']){
-                                sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} echo 'hey you there'"
-                                // sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerLogin}"
-                                // sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerRun}"                            
-                            }
-                           } 
-                        }
-                    else if (params.environment == 'qa'){
-                        withCredentials([usernamePassword(credentialsId: '3fd6e258-dfed-4537-a548-c3272953e573', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {                        
-                            
-                            def dockerRun = 'sudo docker run -p 8080:8080 -d $dockerImage'
-                            def dockerLogin = 'sudo docker login -u $DOCKERHUB_CREDENTIALS_USR -p $DOCKERHUB_CREDENTIALS_PSW'
-                            
-                            sshagent(['qa-server']){
-                                sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} echo 'hey you there'"
-                                // sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerLogin}"
-                                // sh "ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} ${dockerRun}"                            
-                            }
-                        }
-                    }
-                } 
-            }
-        }   
+        // }   
 
         stage('Health Check') {
             steps {
