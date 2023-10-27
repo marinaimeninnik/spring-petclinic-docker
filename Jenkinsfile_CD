@@ -16,11 +16,7 @@ pipeline {
     parameters{
         string(name: 'publicIp', defaultValue: '18.159.208.8', description: 'Enter public ip target deployment machine')
         choice(name: 'environment', choices: ['dev', 'qa'], description: 'Select environment for deployment')
-        activeChoiceReactiveParam('dockerTag') {
-            description('Select a Docker image tag')
-            script {
-                return getDockerImageTags()
-            }
+        activeChoiceReactiveParam(name: 'dockerTag', description: 'Select a Docker image tag', choices: script{return getDockerImageTags()})
         }
     }
     
