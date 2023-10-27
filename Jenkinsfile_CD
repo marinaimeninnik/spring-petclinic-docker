@@ -6,6 +6,21 @@ pipeline {
     parameters{
         string(name: 'publicIp', defaultValue: '18.159.208.8', description: 'Enter public ip target deployment machine')
         choice(name: 'environment', choices: ['dev', 'qa'], description: 'Select environment for deployment')
+        choice(
+            name: 'dockerTag',
+            description: 'Select a Docker image version',
+            script: [
+                $class: 'GroovyScript',
+                script: [
+                    classpath: [],
+                    sandbox: false,
+                    script: 'def imageName = "marinaimeninnik/petclinic"\n' +
+                            'def dockerTags = "docker pull --all-tags $imageName".execute().text\n' +
+                            'def tagsArray = dockerTags.readLines()\n' +
+                            'return tagsArray.join(",")'
+                ]
+            ]
+        )
     }
     
     environment {
@@ -54,7 +69,7 @@ pipeline {
                             echo 'Application is healthy'
                             break
                         } else {
-                            echo 'Application is not healthy yet, retrying in 10 seconds...'
+                            echo 'Application is not healthy yet, retrying in 30 seconds...'
                             sleep 30
                             retries++
                         }
