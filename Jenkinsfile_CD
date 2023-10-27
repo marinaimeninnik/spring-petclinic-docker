@@ -21,7 +21,7 @@ pipeline {
                                          script: [classpath: [],
                                             oldScript: '',
                                             sandbox: false,
-                                                script: 'sh( script: "sudo docker image ls marinaimeninnik/petclinic --format \'{{.Tag}}\'", returnStdout: true).trim().split(\'\\n\').toList()']))
+                                                script: 'sh( script: "sudo docker image ls marinaimeninnik/petclinic --format \'{{.Tag}}\'", returnStdout: true).trim().split(\'\\n\').toList()']
                         )
                     )
     }
