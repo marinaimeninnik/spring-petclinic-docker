@@ -30,7 +30,54 @@ Users associated with certain roles on Assign Roles page (manage/role-strategy/a
 <br>![task1_3](IMG/task1_3_2.png)</br>
 
 ## Part 2 (Multibranch)
+
 ...
+### 3. Block merge request in case of job's fail.
+
+Based on this [Github Documentation](https://docs.github.com/en/rest/commits/statuses?apiVersion=2022-11-28) two postactions were added to pipeline. They send pipeline's execute status to github:
+
+```
+failure {
+            script {
+                def commitSha = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+
+                withCredentials([usernamePassword(credentialsId: '5f407016-3f8c-4868-8f54-e2e660c91a3c', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                    sh """
+                    curl -L -X POST -H "Accept: application/vnd.github+json" \
+                    -H "Authorization: Bearer \$GIT_PASSWORD" -H "X-GitHub-Api-Version: 2022-11-28" \
+                    https://api.github.com/repos/marinaimeninnik/project_jenkins_L2/statuses/$commitSha \
+                    -d '{"state":"failure","target_url":"https://your-pipeline-failure-url","description":"Pipeline failed","context":"ci/jenkins"}'
+                    """
+                }
+            }
+        }
+        success {
+            script {
+                def commitSha = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+
+                withCredentials([usernamePassword(credentialsId: '5f407016-3f8c-4868-8f54-e2e660c91a3c', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                    sh """
+                    curl -L -X POST -H "Accept: application/vnd.github+json" \
+                    -H "Authorization: Bearer \$GIT_PASSWORD" -H "X-GitHub-Api-Version: 2022-11-28" \
+                    https://api.github.com/repos/marinaimeninnik/project_jenkins_L2/statuses/$commitSha \
+                    -d '{"state":"success","target_url":"https://your-pipeline-success-url","description":"Pipeline succeeded","context":"ci/jenkins"}'
+                    """
+                }
+            }
+        }
+```
+Also Github should be configured from its side:
+<br>![task2_3](IMG/task2_3_3.png)</br>
+
+Repository should be public of added to GitHub Team or Organization account otherwise you'll have an error:
+<br>![task2_3](IMG/task2_3_4.png)</br>
+
+Configurations in action.</br>
+Merge request blocked until pipeline's status won't be success:
+<br>![task2_3](IMG/task2_3_1.png)</br>
+
+Pipeline's success:
+<br>![task2_3](IMG/task2_3_2.png)</br>
 
 ## Part 3 (CI pipeline)
 ...
@@ -51,3 +98,49 @@ SonarQube scanner plugin installed and it's server configured
 <br>![task3_4](IMG/task3_4_3.png)</br>
 
 ### 7. Push image into Docker Hub
+
+## Part 4 (CD pipeline)
+
+....
+
+### 4. E-mail notification
+
+Pesonal Gmail account has been used
+
+Gmail properties:
+2-Step Verification turned On
+<br>![task4_4](IMG/task4_4_1.png)</br>
+
+App password should be generated:
+Google -> manage your google account -> app passwords
+<br>![task4_4](IMG/task4_4_3.png)</br>
+
+Install email extension
+<br>![task4_4](IMG/task4_4_2.png)</br>
+
+Configure it:
+<br>![task4_4](IMG/task4_4_6.png)</br>
+
+Add email notification block to jenkinsfile postaction part:
+```
+failure {
+            emailext subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
+                    body: "The Jenkins pipeline ${currentBuild.fullDisplayName} has failed.",
+                    to: "marinaimeninnik@gmail.com"
+        }
+        success {
+            emailext subject: "Pipeline Succeeded: ${currentBuild.fullDisplayName}",
+                    body: "The Jenkins pipeline ${currentBuild.fullDisplayName} has succeeded.",
+                    to: "marinaimeninnik@gmail.com"
+        }
+```
+
+Another approach.
+Default Email Notifier (for using in Freestyle project where you can add post-build action via web-interface ):
+
+Configure E-mail notifications in global system configurations
+<br>![task4_4](IMG/task4_4_4.png)</br>
+
+Test configurations
+<br>![task4_4](IMG/task4_4_5.png)</br>
+

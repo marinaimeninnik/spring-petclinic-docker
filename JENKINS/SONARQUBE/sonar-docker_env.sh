@@ -30,10 +30,11 @@ echo 'Docker has been installed'
 docker --version
 
 echo 'Launching SonarQube container...'
-docker run -d --name sonarqube -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true -p 8080:9000 sonarqube:latest
+# docker run -d --name sonarqube -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true -p 8080:9000 sonarqube:latest
+docker run -d -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true -p 8080:9000 sonarqube:latest
 
 echo 'Exposing SonarQube outside...'
-iptables -t nat -A PREROUTING -p tcp --dport 9000 -j DNAT --to-destination 172.17.0.1:9000
+iptables -t nat -A PREROUTING -p tcp --dport 8080 -j DNAT --to-destination 172.17.0.1:9000
 
 apt-get install iptables-persistent -y
 sudo netfilter-persistent save

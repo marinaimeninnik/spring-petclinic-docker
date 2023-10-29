@@ -1,6 +1,6 @@
 #! bin/bash/
 
-# ubuntu_20 or 22 supported
+# ubuntu_20 or 22 supported. Just notes, had not been tested
 
 USERNAME="ddsonar"
 PASSWD="mwd#2%#!!#%rgs"
