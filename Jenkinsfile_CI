@@ -38,6 +38,7 @@ pipeline {
         stage('Clone') {
             steps {
                 git branch: 'main', url: 'https://github.com/marinaimeninnik/spring-petclinic-docker.git'
+                sh 'echo "Hello"'
             }
         }
 
