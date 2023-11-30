@@ -17,6 +17,23 @@ pipeline {
                 cleanWs()
             }
         }
+
+         stage('Check Merge Request') {
+             steps {
+                 script {
+                    // Check if the webhook payload indicates a merge request
+                    def payload = readFile "${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/github-pull-request-${BUILD_NUMBER}.json"
+                    def jsonPayload = readJSON text: payload
+
+                    if (jsonPayload.action == 'synchronize' || jsonPayload.action == 'opened') {
+                        echo 'GitHub webhook triggered the pipeline for a merge request'
+                    } else {
+                        echo 'GitHub webhook triggered the pipeline, but not for a merge request. Exiting...'
+                        currentBuild.result = 'ABORTED'
+                        error('Not a merge request. Aborting the pipeline.')
+                    }
+                }
+            }
     
         stage('Clone') {
             steps {
@@ -24,61 +41,48 @@ pipeline {
             }
         }
 
-        // stage('Build app')
-        //     steps{
-        //         sh "./mvnw package"
-        //     }
+        stage('Build app')
+             steps{
+                 sh "./mvnw package"
+             }
 
-//        stage('Scan with SonarQube') {
-//            steps {
-//                withSonarQubeEnv(installationName: 'SQ') { 
-//                    sh './mvnw package org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
-//                    sh 'echo "Hello"'
-//                }
-//            }
-//        }
+        stage('Scan with SonarQube') {
+            steps {
+                withSonarQubeEnv(installationName: 'SQ') { 
+                    sh './mvnw package org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
+                    sh 'echo "Hello"'
+                }
+            }
+        }
 
-  //      stage('Build Docker Image') {
-  //          steps {                
-  //              script {
-  //                  sh "docker build -t ${IMAGE_NAME} . -f Dockerfile"
-  //              }
-  //          }
-  //      }
+        stage('Build Docker Image') {
+            steps {                
+                script {
+                    sh "docker build -t ${IMAGE_NAME} . -f Dockerfile"
+                }
+            }
+        }
         
 
-  //      stage('Tag and Push') {
-  //          steps {
-  //              script {
-  //                  def buildVersion = "1.0.${env.BUILD_NUMBER}"
-  //                  sh "sudo docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${buildVersion}"
+        stage('Tag and Push') {
+            steps {
+                script {
+                    def buildVersion = "1.0.${env.BUILD_NUMBER}"
+                    sh "sudo docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${buildVersion}"
                     
-  //                  withCredentials([usernamePassword(credentialsId: '3fd6e258-dfed-4537-a548-c3272953e573', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
-  //                      sh "sudo docker login -u $DOCKERHUB_CREDENTIALS_USR -p $DOCKERHUB_CREDENTIALS_PSW"
-  //                      sh "sudo docker push ${IMAGE_NAME}:${buildVersion}"
-  //                      sh "sudo docker push ${IMAGE_NAME}:latest"
-  //                  }
-  //              }
-  //          }
-  //      }
+                    withCredentials([usernamePassword(credentialsId: '3fd6e258-dfed-4537-a548-c3272953e573', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
+                        sh "sudo docker login -u $DOCKERHUB_CREDENTIALS_USR -p $DOCKERHUB_CREDENTIALS_PSW"
+                        sh "sudo docker push ${IMAGE_NAME}:${buildVersion}"
+                        sh "sudo docker push ${IMAGE_NAME}:latest"
+                    }
+                }
+            }
+        }
     }
 
     post {
-  //      always {
-  //      sh 'docker logout'
-  //      }
-        
-        success {
-            script {
-                // Check if the webhook payload indicates a push to the main branch
-                def payload = readJSON text: env.GITHUB_PAYLOAD
-                def branch = payload.ref.split('/').last()
-
-                if (payload.after && branch == 'main') {
-                    echo 'GitHub webhook triggered the pipeline for main branch'
-                    // Additional steps you want to perform on main branch push
-                }
-            }
+        always {
+        sh 'docker logout'
         }
     }
 }
