@@ -38,35 +38,35 @@ pipeline {
 //            }
 //        }
 
-        stage('Build Docker Image') {
-            steps {                
-                script {
-                    sh "docker build -t ${IMAGE_NAME} . -f Dockerfile"
-                }
-            }
-        }
+  //      stage('Build Docker Image') {
+  //          steps {                
+  //              script {
+  //                  sh "docker build -t ${IMAGE_NAME} . -f Dockerfile"
+  //              }
+  //          }
+  //      }
         
 
-        stage('Tag and Push') {
-            steps {
-                script {
-                    def buildVersion = "1.0.${env.BUILD_NUMBER}"
-                    sh "sudo docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${buildVersion}"
+  //      stage('Tag and Push') {
+  //          steps {
+  //              script {
+  //                  def buildVersion = "1.0.${env.BUILD_NUMBER}"
+  //                  sh "sudo docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${buildVersion}"
                     
-                    withCredentials([usernamePassword(credentialsId: '3fd6e258-dfed-4537-a548-c3272953e573', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
-                        sh "sudo docker login -u $DOCKERHUB_CREDENTIALS_USR -p $DOCKERHUB_CREDENTIALS_PSW"
-                        sh "sudo docker push ${IMAGE_NAME}:${buildVersion}"
-                        sh "sudo docker push ${IMAGE_NAME}:latest"
-                    }
-                }
-            }
-        }
-    }
+  //                  withCredentials([usernamePassword(credentialsId: '3fd6e258-dfed-4537-a548-c3272953e573', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
+  //                      sh "sudo docker login -u $DOCKERHUB_CREDENTIALS_USR -p $DOCKERHUB_CREDENTIALS_PSW"
+  //                      sh "sudo docker push ${IMAGE_NAME}:${buildVersion}"
+  //                      sh "sudo docker push ${IMAGE_NAME}:latest"
+  //                  }
+  //              }
+  //          }
+  //      }
+  //  }
 
     post {
-        always {
-        sh 'docker logout'
-        }
+  //      always {
+  //      sh 'docker logout'
+  //      }
         
         success {
             script {
