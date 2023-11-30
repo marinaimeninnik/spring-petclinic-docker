@@ -41,10 +41,10 @@ pipeline {
             }
         }
 
-        stage('Build app')
-             steps{
-                 sh "./mvnw package"
-             }
+//        stage('Build app')
+//             steps{
+//                 sh "./mvnw package"
+//             }
 
         stage('Scan with SonarQube') {
             steps {
