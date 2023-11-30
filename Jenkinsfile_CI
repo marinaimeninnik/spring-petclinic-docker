@@ -21,7 +21,6 @@ pipeline {
          stage('Check Merge Request') {
              steps {
                  script {
-                    // Check if the webhook payload indicates a merge request
                     def payload = readFile "${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/github-pull-request-${BUILD_NUMBER}.json"
                     def jsonPayload = readJSON text: payload
 
@@ -34,6 +33,7 @@ pipeline {
                     }
                 }
             }
+        }
     
         stage('Clone') {
             steps {
