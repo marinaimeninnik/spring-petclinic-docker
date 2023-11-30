@@ -33,6 +33,7 @@ pipeline {
             steps {
                 withSonarQubeEnv(installationName: 'SQ') { 
                     sh './mvnw package org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
+                    sh 'echo "Hello"'
                 }
             }
         }
