@@ -4,8 +4,10 @@ pipeline {
     }
 
     triggers {
-        githubPush()
-        githubPullRequests()
+       github (
+            events: ['pull_request']
+            // You can add more events as needed
+        )
     }
 
     environment {
