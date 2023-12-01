@@ -3,16 +3,6 @@ pipeline {
         label 'ubuntu22_04'
     }
 
-    triggers {
-        githubPullRequest(
-            serverUrl: 'https://github.com',
-            credentialsId: 'github-creds',
-            repoOwner: 'my-org',
-            repository: 'my-repo',
-            triggerPhrase: 'test this'
-        )      
-    }
-
     environment {
         DOCKERHUB_CREDENTIALS = credentials('3fd6e258-dfed-4537-a548-c3272953e573')
         BUILD_VERSION = sh(script: 'echo $((BUILD_NUMBER + 0))', returnStatus: true)
@@ -21,29 +11,22 @@ pipeline {
 
     }
 
+    triggers {
+        githubPullRequest(
+            events: [close(), open()],
+            triggerPhrase: 'run-build',
+            orgWhitelist: ['my_github_org'],
+            cron: false, // Disable cron since we are using GitHub webhook events
+            autoCloseFailedPullRequests: true
+        )
+    }
+
     stages {
         stage('Clean workspace') {
             steps {
                 cleanWs()
             }
         }
-
-  //       stage('Check Merge Request') {
-  //           steps {
-  //               script {
-  //                  def payload = readFile "${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/github-pull-request-${BUILD_NUMBER}.json"
-  //                  def jsonPayload = readJSON text: payload
-  //
-  //                  if (jsonPayload.action == 'synchronize' || jsonPayload.action == 'opened') {
-  //                      echo 'GitHub webhook triggered the pipeline for a merge request'
-  //                  } else {
-  //                      echo 'GitHub webhook triggered the pipeline, but not for a merge request. Exiting...'
-  //                      currentBuild.result = 'ABORTED'
-  //                      error('Not a merge request. Aborting the pipeline.')
-  //                  }
-  //              }
-  //          }
-  //      }
     
         stage('Clone') {
             steps {
