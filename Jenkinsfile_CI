@@ -18,22 +18,22 @@ pipeline {
             }
         }
 
-         stage('Check Merge Request') {
-             steps {
-                 script {
-                    def payload = readFile "${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/github-pull-request-${BUILD_NUMBER}.json"
-                    def jsonPayload = readJSON text: payload
-
-                    if (jsonPayload.action == 'synchronize' || jsonPayload.action == 'opened') {
-                        echo 'GitHub webhook triggered the pipeline for a merge request'
-                    } else {
-                        echo 'GitHub webhook triggered the pipeline, but not for a merge request. Exiting...'
-                        currentBuild.result = 'ABORTED'
-                        error('Not a merge request. Aborting the pipeline.')
-                    }
-                }
-            }
-        }
+  //       stage('Check Merge Request') {
+  //           steps {
+  //               script {
+  //                  def payload = readFile "${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/github-pull-request-${BUILD_NUMBER}.json"
+  //                  def jsonPayload = readJSON text: payload
+  //
+  //                  if (jsonPayload.action == 'synchronize' || jsonPayload.action == 'opened') {
+  //                      echo 'GitHub webhook triggered the pipeline for a merge request'
+  //                  } else {
+  //                      echo 'GitHub webhook triggered the pipeline, but not for a merge request. Exiting...'
+  //                      currentBuild.result = 'ABORTED'
+  //                      error('Not a merge request. Aborting the pipeline.')
+  //                  }
+  //              }
+  //          }
+  //      }
     
         stage('Clone') {
             steps {
