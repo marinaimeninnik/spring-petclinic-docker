@@ -4,10 +4,34 @@ pipeline {
     }
 
     triggers {
-       github (
-            events: ['pull_request']
-            // You can add more events as needed
-        )
+        githubPullRequests(
+            spec: 'HOOKS',
+            events: [
+                close(),
+                open(),
+                commentPattern('Jenkins, retest this please'),
+                commitChanged(),
+                description('run-build'),
+                labelsAdded(['label1', 'label2']),
+                labelsExist(['label3']),
+                labelsNotExist(['label4']),
+                labelsPatternExists('pattern'),
+                labelsRemoved(['label5']),
+                nonMergeable(),
+                buildNumber(42)
+            ],
+            userRestriction: [
+                orgs('org1', 'org2'),
+                users('user1', 'user2')
+            ],
+            skipFirstRun: true,
+            abortRunning: true,
+            branchRestriction: [
+                targetBranch('main', 'feature/*')
+            ],
+            cancelQueued: true,
+            preStatus: true
+        )       
     }
 
     environment {
