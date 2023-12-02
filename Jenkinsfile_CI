@@ -11,9 +11,14 @@ pipeline {
 
     }
 
-    options {
-        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
-        disableConcurrentBuilds()
+    scm {
+        git {
+            remote {
+                github('test-owner/test-project')
+                refspec('+refs/pull/*:refs/remotes/origin/pr/*')
+            }
+            branch('${sha1}')
+        }
     }
 
     triggers {
