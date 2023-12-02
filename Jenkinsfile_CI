@@ -11,21 +11,21 @@ pipeline {
 
     }
 
-    scm {
-        git {
-            remote {
-                github('test-owner/test-project')
-                refspec('+refs/pull/*:refs/remotes/origin/pr/*')
-            }
-            branch('${sha1}')
-        }
-    }
+    // scm {
+    //     git {
+    //         remote {
+    //             github('test-owner/test-project')
+    //             refspec('+refs/pull/*:refs/remotes/origin/pr/*')
+    //         }
+    //         branch('${sha1}')
+    //     }
+    // }
 
-    triggers {
-        ghprb(autoClosePullRequests: true,
-              adminList: ['jenkins'],
-              userWhitelist: ['marinaimeninnik'])
-    }
+    // triggers {
+    //     ghprb(autoClosePullRequests: true,
+    //           adminList: ['jenkins'],
+    //           userWhitelist: ['marinaimeninnik'])
+    // }
 
     stages {
         stage('Clean workspace') {
@@ -86,6 +86,3 @@ pipeline {
         }
     }
 }
-
-   
-
