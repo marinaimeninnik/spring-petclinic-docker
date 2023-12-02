@@ -19,7 +19,7 @@ pipeline {
     triggers {
         ghprb(autoClosePullRequests: true,
               adminList: ['jenkins'],
-              userWhitelist: ['marinaimeninnik']
+              userWhitelist: ['marinaimeninnik'])
     }
 
     stages {
