@@ -11,15 +11,17 @@ pipeline {
 
     }
 
-//    triggers {
-//        githubPullRequest(
-//            events: [close(), open()],
-//            triggerPhrase: 'run-build',
-//            orgWhitelist: ['my_github_org'],
-//            cron: false, // Disable cron since we are using GitHub webhook events
-//            autoCloseFailedPullRequests: true
-//        )
-//    }
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
+        disableConcurrentBuilds()
+    }
+
+    triggers {
+        ghprb(autoClosePullRequests: true,
+              adminList: ['jenkins'],
+              userWhitelist: ['marinaimeninnik']}
+              ])
+    }
 
     stages {
         stage('Clean workspace') {
