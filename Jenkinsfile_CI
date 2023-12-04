@@ -27,6 +27,13 @@ pipeline {
     //           userWhitelist: ['marinaimeninnik'])
     // }
 
+    triggers {
+        githubPullRequest(
+            branches: [[pattern: 'master']],
+            triggerPhrase: 'retest this please'
+        )
+    }
+
     stages {
         stage('Clean workspace') {
             steps {
