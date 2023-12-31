@@ -35,3 +35,4 @@ Resources:
     DependsOn: EC2group-Stack
     Properties:
       TemplateURL: "https://${S3BucketName}."
+
