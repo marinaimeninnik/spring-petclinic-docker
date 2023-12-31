@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  S3BucketName:
+    Type: String
+    Description: "Name of the S3 bucket"
+    Default: "cloudtask-bucket"
+
+Resources: 
+  NetworkStack:
+    Type: "AWS::CloudFormation::Stack"
+    Properties:
+      TemplateURL: "https://${S3BucketName}.s3.eu-central-1.amazonaws.com/network-stack.yaml"
+ 
+  SecurityStack:
+    Type: "AWS::CloudFormation::Stack"
+    Properties:
+      TemplateURL: "https://${S3BucketName}.s3.eu-central-1.amazonaws.com/security-stack.yaml"
+      Capabilities:
+      - CAPABILITY_NAMED_IAM
+
+  RDSStack:
+    Type: "AWS::CloudFormation::Stack"
+    DependsOn: SecurityStack
+    Properties:
+      TemplateURL: "https://${S3BucketName}.s3.eu-central-1.amazonaws.com/rds-stack.yaml"
+
+  EC2group-Stack:
+    Type: "AWS::CloudFormation::Stack"
+    DependsOn: RDSStack
+    Properties:
+      TemplateURL: "https://${S3BucketName}."
+
+  DNS-Stack:
+    Type: "AWS::CloudFormation::Stack"
+    DependsOn: EC2group-Stack
+    Properties:
+      TemplateURL: "https://${S3BucketName}."
